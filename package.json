@@ -2,12 +2,6 @@
   "name": "legal-ai-analyzer",
   "version": "1.0.0",
   "description": "AI Legal Document Analyzer",
-  "main": "api/analyze.js",
-  "type": "module",
-  "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node backend/server.js"
-  },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "cors": "^2.8.5",
