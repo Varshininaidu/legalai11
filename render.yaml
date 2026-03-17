@@ -1,25 +1,15 @@
 services:
-  # Backend Web Service
+  # Unified Web Service (Backend + Frontend)
   - type: web
-    name: legal-ai-backend
+    name: legal-ai-analyzer
     runtime: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: npm install && cd backend && npm install
+    startCommand: node backend/server.js
     envVars:
       - key: GEMINI_API_KEY
-        sync: false
-      - key: CLIENT_URL
-        value: https://legal-ai-frontend.onrender.com
-      - key: PORT
-        value: 5000
+        sync: false # Set this in Render dashboard
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
 
-  # Frontend Static Site
-  - type: web
-    name: legal-ai-frontend
-    runtime: static
-    buildCommand: ""
-    staticPublishPath: ./
-    envVars: []
