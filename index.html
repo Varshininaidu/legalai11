@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Legal Document Analyzer</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Background Glow Elements -->
+    <div class="bg-glow spot-1"></div>
+    <div class="bg-glow spot-2"></div>
+    <div class="bg-glow spot-3"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="main-nav" style="display: none;">
+        <div class="logo" onclick="app.navigateTo('upload-view')">
+            <div class="logo-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <span>LEGAL.AI</span>
+        </div>
+        <div class="nav-links">
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff" alt="User">
+                <span class="username">Guest</span>
+            </div>
+            <button class="btn-icon chat-trigger" onclick="app.toggleChat()" aria-label="Open AI Assistant">
+                <i class="fa-solid fa-robot"></i>
+                <span class="notification-dot"></span>
+            </button>
+            <button class="btn-icon danger-hover" onclick="app.logout()" aria-label="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- App Container containing all Views -->
+    <main class="app-container">
+
+        <!-- 1. Landing Page -->
+        <section id="landing-view" class="view active">
+            <div class="hero">
+                <div class="hero-badge">Next-Gen Legal AI</div>
+                <h1 class="hero-title">Decode Legal Documents in <span class="text-gradient">Seconds</span></h1>
+                <p class="hero-subtitle">Upload your contracts, agreements, and policies. Our AI instantly identifies
+                    hidden risks, translates to regional languages, and provides plain-english summaries.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-lg" onclick="app.navigateTo('auth-view')">
+                        Get Started <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-secondary btn-lg" onclick="app.navigateTo('auth-view')">
+                        Learn More
+                    </button>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-shield-halved text-danger"></i>
+                        <h3>Risk Analysis</h3>
+                        <p>Automatically highlight critical clauses and hidden liabilities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-language text-primary"></i>
+                        <h3>Multilingual</h3>
+                        <p>Translate complex legal English into simple regional languages (e.g. Telugu).</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fa-solid fa-robot text-secondary"></i>
+                        <h3>AI Chat Assistant</h3>
+                        <p>Chat with your document to clarify any confusing terms instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Auth Page (Login/Register) -->
+        <section id="auth-view" class="view">
+            <div class="auth-container glass-panel">
+                <div class="auth-header">
+                    <div class="logo-icon lg"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h2>Welcome to LEGAL.AI</h2>
+                    <p>Sign in to access your secure legal dashboard</p>
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="app.switchAuthTab('login')">Login</button>
+                    <button class="auth-tab" onclick="app.switchAuthTab('register')">Register</button>
+                </div>
+
+                <form id="auth-form" onsubmit="event.preventDefault(); app.login();">
+                    <div class="input-group" id="name-group" style="display: none;">
+                        <label>Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-user"></i>
+                            <input type="text" placeholder="John Doe">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope"></i>
+                            <input type="email" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full mt-4" id="auth-submit-btn">Sign In</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. Upload Dashboard -->
+        <section id="upload-view" class="view">
+            <div class="section-header">
+                <h2>Analyze a Document</h2>
+                <p>Upload a PDF contract, agreement, or policy to begin.</p>
+            </div>
+
+            <div class="upload-container glass-panel" id="drop-zone"
+                ondragover="event.preventDefault(); this.classList.add('dragover');"
+                ondragleave="this.classList.remove('dragover');"
+                ondrop="event.preventDefault(); this.classList.remove('dragover'); app.handleDrop(event);">
+                <input type="file" id="file-input" accept=".pdf" class="hidden-input"
+                    onchange="app.handleFileSelect(event)">
+                <div class="upload-icon-wrapper">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3>Drag & Drop your PDF here</h3>
+                <p class="text-muted">or</p>
+                <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Browse
+                    Files</button>
+                <p class="upload-hint">Max file size: 20MB. Encrypted and stored securely.</p>
+            </div>
+
+            <!-- Upload Progress (Hidden by default) -->
+            <div class="upload-progress glass-panel" id="upload-progress" style="display: none;">
+                <div class="file-info">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    <span id="selected-file-name">document.pdf</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-status" id="progress-status">Uploading... 0%</div>
+            </div>
+        </section>
+
+        <!-- 4. Analysis Dashboard & Insights -->
+        <section id="dashboard-view" class="view">
+            <div class="dashboard-header">
+                <div>
+                    <h2 class="doc-title"><i class="fa-regular fa-file-lines"></i> Non-Disclosure_Agreement.pdf</h2>
+                    <p class="text-muted">Analyzed on <span id="current-date">Today</span></p>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-secondary" onclick="app.downloadReport()">
+                        <i class="fa-solid fa-download"></i> Download Report
+                    </button>
+                    <button class="btn btn-primary" onclick="app.toggleChat()">
+                        <i class="fa-solid fa-robot"></i> Ask AI
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Risk Visualization -->
+                <div class="card glass-panel risk-card">
+                    <h3>Overall Risk Assessment</h3>
+                    <div class="chart-container">
+                        <canvas id="riskChart"></canvas>
+                        <div class="chart-center-text">
+                            <span class="risk-score">70%</span>
+                            <span class="risk-label">Score</span>
+                        </div>
+                    </div>
+                    <div class="risk-legends">
+                        <div class="legend-item"><span class="dot danger"></span> High Risk (30%)</div>
+                        <div class="legend-item"><span class="dot warning"></span> Moderate (40%)</div>
+                        <div class="legend-item"><span class="dot success"></span> Safe (30%)</div>
+                    </div>
+                </div>
+
+                <!-- Smart Summary -->
+                <div class="card glass-panel summary-card">
+                    <h3><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> Smart Summary</h3>
+                    <p class="summary-text">
+                        This document is a standard Mutual Non-Disclosure Agreement (NDA). It heavily restricts the
+                        sharing of confidential information for a period of <strong>5 years</strong>. There is a strict
+                        arbitration clause that limits your ability to file a lawsuit in a public court.
+                    </p>
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <span class="stat-value">12</span>
+                            <span class="stat-name">Pages</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">4</span>
+                            <span class="stat-name">Obligations</span>
+                        </div>
+                        <div class="stat-box danger-box">
+                            <span class="stat-value">2</span>
+                            <span class="stat-name">Critical Risks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Insights & Translation View -->
+                <div class="card glass-panel insights-card full-width">
+                    <div class="card-header-flex">
+                        <h3>Key Clauses & Risks</h3>
+                        <div class="language-toggle">
+                            <span class="lang-label" id="lang-en">English</span>
+                            <label class="switch">
+                                <input type="checkbox" id="lang-toggle" onchange="app.toggleLanguage()">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="lang-label" id="lang-te">తెలుగు</span>
+                        </div>
+                    </div>
+
+                    <div class="insights-list" id="insights-list-en">
+                        <div class="insight-item risk-high">
+                            <div class="insight-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="insight-content">
+                                <h4>Indemnity Clause (Section 4.2)</h4>
+                                <p class="original-text">"The receiving party shall indemnify and hold harmless the
+                                    disclosing party from any damages arising from breach..."</p>
+                                <p class="simple-text"><strong>Simple Explanation:</strong> If you leak information, you
+                                    have to pay for ALL damages. This is highly risky.</p>
+                            </div>
+                            <div class="badge danger-bg">High Risk</div>
+                        </div>
+
+                        <div class="insight-item risk-moderate">
+                            <div class="insight-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <div class="insight-content">
+                                <h4>Non-Compete duration (Section 6)</h4>
+                                <p class="original-text">"Recipient agrees not to engage in competing business for a
+                                    period of 24 months..."</p>
+                                <p class="simple-text"><strong>Simple Explanation:</strong> You cannot work for a
+                                    competitor for 2 years after this agreement ends.</p>
+                            </div>
+                            <div class="badge warning-bg">Moderate</div>
+                        </div>
+
+                        <div class="insight-item risk-safe">
+                            <div class="insight-icon"><i class="fa-solid fa-check-circle"></i></div>
+                            <div class="insight-content">
+                                <h4>Governing Law (Section 11)</h4>
+                                <p class="original-text">"This agreement shall be governed by the laws of the State..."
+                                </p>
+                                <p class="simple-text"><strong>Simple Explanation:</strong> The contract follows
+                                    standard local laws. Standard clause.</p>
+                            </div>
+                            <div class="badge success-bg">Safe</div>
+                        </div>
+                    </div>
+
+                    <!-- Telugu Translation -->
+                    <div class="insights-list" id="insights-list-te" style="display: none;">
+                        <div class="insight-item risk-high">
+                            <div class="insight-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="insight-content">
+                                <h4>నష్టపరిహార నిబంధన (విభాగం 4.2)</h4>
+                                <p class="original-text">"కొత్త డాక్యుమెంట్ ప్రకారం, మీరు సమాచారాన్ని బయటపెడితే..."</p>
+                                <p class="simple-text"><strong>సాధారణ వివరణ:</strong> ఒకవేళ మీరు సమాచారాన్ని లీక్
+                                    చేస్తే, నష్టాలన్నింటికీ మీరు బాధ్యత వహించాలి (డబ్బు చెల్లించాలి). ఇది చాలా
+                                    ప్రమాదకరం.</p>
+                            </div>
+                            <div class="badge danger-bg">అధిక ప్రమాదం</div>
+                        </div>
+
+                        <div class="insight-item risk-moderate">
+                            <div class="insight-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <div class="insight-content">
+                                <h4>పోటీ చేయకూడని వ్యవధి (విభాగం 6)</h4>
+                                <p class="original-text">"స్వీకరించే వ్యక్తి 24 నెలల పాటు పోటీ వ్యాపారంలో పాల్గొనకూడదని
+                                    అంగీకరిస్తాడు..."</p>
+                                <p class="simple-text"><strong>సాధారణ వివరణ:</strong> ఈ ఒప్పందం ముగిసిన తర్వాత మీరు 2
+                                    సంవత్సరాల పాటు పోటీ సంస్థలో పని చేయలేరు.</p>
+                            </div>
+                            <div class="badge warning-bg">మధ్యస్థ ప్రమాదం</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 7. AI Chat Assistant (Sidebar) -->
+    <aside class="chat-sidebar glass-panel" id="chat-sidebar">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fa-solid fa-robot text-primary"></i>
+                <div>
+                    <h3>Legal AI Assistant</h3>
+                    <span class="status-online">Online</span>
+                </div>
+            </div>
+            <button class="btn-icon" onclick="app.toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message system">
+                <div class="msg-content">Hello! I have analyzed your document. You can ask me questions like:
+                    <ul>
+                        <li>"Is this agreement safe to sign?"</li>
+                        <li>"What are my main risks?"</li>
+                        <li>"Summarize section 4 for me."</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <form onsubmit="event.preventDefault(); app.sendChatMessage();">
+                <input type="text" id="chat-input" placeholder="Ask a question..." autocomplete="off">
+                <button type="submit" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="app.toggleChat()"></div>
+
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+
+</html>

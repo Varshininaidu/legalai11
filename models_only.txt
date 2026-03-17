@@ -1,0 +1,22 @@
+﻿
+ - models/gemini-2.5-fl
+ash (Gemini 2.5 Flash)
+ - 
+models/gemini-2.5-pro 
+(Gemini 2.5 Pro)
+ - models/gemini-2.0-fl
+ash (Gemini 2.0 Flash)
+ - models/gemini-2.0-fl
+ash-001 (Gemini 2.0 
+Flash 001)
+ - models/gemini-2.0-fl
+ash-lite-001 (Gemini 
+2.0 Flash-Lite 001)
+ - models/gemini-2.0-fl
+ash-lite (Gemini 2.0 
+Flash-Lite)
+ - models/gemini-2.5-fl
+ash-lite (Gemini 2.5 
+Flash-Lite)
+
+

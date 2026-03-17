@@ -1,0 +1,25 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: legal-ai-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLIENT_URL
+        value: https://legal-ai-frontend.onrender.com
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+
+  # Frontend Static Site
+  - type: web
+    name: legal-ai-frontend
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: ./
+    envVars: []
